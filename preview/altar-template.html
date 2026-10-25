@@ -1,0 +1,926 @@
+<title>Hearth &amp; Altar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Marcellus+SC&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a navy "frieze" band like the book cover, then a two-column builder (choices left, live altar plan right; stacked on phones). */
+:root {
+  /* Greek palette, sampled from the From Hearth to Ecstasy cover and sigils. Other pantheons override these from their data. */
+  --bg: #f1eadb;
+  --surface: #e7dcc6;
+  --surface-2: #ded1b4;
+  --ink: #1f2744;
+  --muted: #555a6a;
+  --accent: #a55a22;
+  --accent-soft: rgba(198,123,56,.16);
+  --sage: #6f8582;
+  --line: rgba(37,46,77,.18);
+  --band: #252e4d;
+  --band-ink: #e6dbc5;
+  --band-accent: #c67b38;
+  --medallion: #e6dbc5;
+  --wall: #e3d7bf;
+  --wood: #8a6a4e;
+  --glyph: #252e4d;
+  --font-display: "Marcellus", "Trajan Pro", Georgia, serif;
+  --font-caps: "Marcellus SC", "Marcellus", Georgia, serif;
+  --font-body: "EB Garamond", Garamond, "Times New Roman", serif;
+  --radius: 4px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b2139; --surface: #252e4d; --surface-2: #2e3858; --ink: #e9dfca; --muted: #a9adb9;
+    --accent: #d8914f; --accent-soft: rgba(216,145,79,.16); --sage: #9fb2ae; --line: rgba(230,219,197,.16);
+    --band: #141a30; --band-ink: #e6dbc5; --band-accent: #d8914f; --medallion: #e6dbc5;
+    --wall: #222a46; --wood: #6b543f; --glyph: #e6dbc5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1b2139; --surface: #252e4d; --surface-2: #2e3858; --ink: #e9dfca; --muted: #a9adb9;
+  --accent: #d8914f; --accent-soft: rgba(216,145,79,.16); --sage: #9fb2ae; --line: rgba(230,219,197,.16);
+  --band: #141a30; --band-ink: #e6dbc5; --band-accent: #d8914f; --medallion: #e6dbc5;
+  --wall: #222a46; --wood: #6b543f; --glyph: #e6dbc5; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 18px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; }
+.caps { font-family: var(--font-caps); letter-spacing: .08em; font-size: .78rem; text-transform: uppercase; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+p { margin: 0; }
+
+/* Band */
+.band { background: var(--band); color: var(--band-ink); }
+.band .wrap { padding-block: 28px 22px; display: grid; gap: 18px; }
+.rule { height: 0; border-top: 2px solid var(--band-ink); border-bottom: 2px solid var(--band-ink); padding-top: 4px; opacity: .85; }
+.titlerow { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+.titlerow h1 { font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: .06em; text-transform: uppercase; line-height: 1.05; }
+.titlerow .sub { font-family: var(--font-caps); letter-spacing: .1em; font-size: .85rem; color: var(--band-accent); }
+.frieze { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.frieze::-webkit-scrollbar { display: none; }
+.frieze button { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; border: 0; padding: 0; background: var(--medallion); display: grid; place-items: center; transition: transform .2s; }
+.frieze button img { width: 40px; height: 40px; }
+.frieze button[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--band-accent); }
+@media (hover: hover) { .frieze button:hover { transform: translateY(-2px); } }
+.tagline { max-width: 62ch; font-size: 1.05rem; opacity: .92; }
+
+.notice { border-bottom: 1px solid var(--line); background: var(--surface); }
+.notice .wrap { padding-block: 10px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; font-size: .95rem; color: var(--muted); }
+.notice strong { color: var(--ink); font-weight: 600; }
+
+/* Builder */
+main.wrap { padding-block: 28px 56px; display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1000px) { main.wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); align-items: start; } .plan { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); overflow-y: auto; } }
+.steps { display: grid; gap: 34px; min-width: 0; }
+.step { display: grid; gap: 14px; }
+.stephead { display: flex; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.stephead .num { font-family: var(--font-display); color: var(--accent); font-size: 1.4rem; min-width: 1.6em; }
+.stephead h2 { font-size: 1.45rem; }
+.hint { color: var(--muted); font-size: 1rem; }
+
+.pantheons { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 14px; font-size: .98rem; display: inline-flex; gap: 8px; align-items: center; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip:disabled { cursor: not-allowed; opacity: .6; }
+.chip small { font-family: var(--font-caps); letter-spacing: .06em; font-size: .7rem; text-transform: uppercase; }
+.needs { display: flex; flex-wrap: wrap; gap: 6px; }
+.needs .chip { font-size: .92rem; padding: 3px 11px; }
+
+.deities { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.dcard { position: relative; display: grid; grid-template-columns: 52px minmax(0,1fr); gap: 10px; align-items: center; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 10px 10px 10px 8px; transition: border-color .15s, background .15s; }
+.dcard .med { width: 52px; height: 52px; border-radius: 50%; background: var(--medallion); display: grid; place-items: center; }
+.dcard .med img { width: 48px; height: 48px; }
+.dcard .nm { font-family: var(--font-display); font-size: 1.12rem; line-height: 1.1; }
+.dcard .dm { font-size: .85rem; color: var(--muted); line-height: 1.25; margin-top: 2px; }
+.dcard[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.dcard.rec::after { content: "suggested"; position: absolute; top: -8px; right: 8px; font-family: var(--font-caps); font-size: .62rem; letter-spacing: .08em; background: var(--bg); color: var(--accent); padding: 0 5px; border: 1px solid var(--accent); border-radius: 999px; }
+.dcard.dim { opacity: .55; }
+.selrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .98rem; color: var(--muted); }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+.options { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.opt { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 4px; align-content: start; }
+.opt[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
+.opt .t { font-family: var(--font-display); font-size: 1.1rem; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.opt .d { font-size: .93rem; color: var(--muted); line-height: 1.35; }
+.opt svg { width: 100%; height: 46px; display: block; margin-bottom: 4px; }
+.full { font-family: var(--font-caps); font-size: .62rem; letter-spacing: .08em; color: var(--sage); border: 1px solid var(--sage); border-radius: 999px; padding: 0 6px; white-space: nowrap; }
+
+/* Plan */
+.plan { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }
+.plan-inner { padding: 22px clamp(16px, 3vw, 28px) 28px; display: grid; gap: 22px; }
+.plan h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+.plan h3 { font-size: 1.15rem; display: flex; align-items: baseline; gap: 10px; }
+.plan h3::after { content: ""; flex: 1; border-top: 1px solid var(--line); transform: translateY(-4px); }
+.meta { color: var(--muted); font-size: 1rem; margin-top: 4px; }
+.intent { font-style: italic; }
+.diagram { background: var(--wall); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.diagram svg { display: block; width: 100%; height: auto; }
+.sec { display: grid; gap: 10px; }
+ol.items, ul.list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+ol.items li { display: grid; grid-template-columns: 28px minmax(0,1fr); gap: 10px; align-items: start; }
+ol.items .n { width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--bg); font-family: var(--font-display); font-size: .82rem; display: grid; place-items: center; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.who { font-family: var(--font-caps); font-size: .72rem; letter-spacing: .08em; color: var(--accent); margin-right: 6px; }
+.src { display: inline-block; font-family: var(--font-caps); font-size: .6rem; letter-spacing: .08em; padding: 0 6px; border-radius: 999px; vertical-align: 2px; margin-left: 6px; white-space: nowrap; }
+.src.book { border: 1px solid var(--accent); color: var(--accent); }
+.src.hist { border: 1px solid var(--ink); color: var(--ink); opacity: .75; }
+.src.draft { border: 1px dashed var(--sage); color: var(--sage); }
+ul.list li { padding-left: 16px; position: relative; }
+ul.list li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.note { border-left: 2px solid var(--accent); padding: 4px 0 4px 12px; font-size: 1rem; }
+blockquote { margin: 0; font-style: italic; font-size: 1.08rem; line-height: 1.45; }
+blockquote cite { display: block; font-style: normal; font-size: .85rem; color: var(--muted); margin-top: 4px; }
+.timeline { display: grid; gap: 0; }
+.tl { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.tl:first-child { border-top: 0; padding-top: 0; }
+.tl .when { font-family: var(--font-caps); font-size: .76rem; letter-spacing: .08em; color: var(--accent); padding-top: 3px; }
+.tl .what { display: grid; gap: 6px; min-width: 0; }
+.tl .what > .src, .tl .what > .lock { justify-self: start; margin-left: 0; }
+.tl label { display: flex; gap: 8px; align-items: start; cursor: pointer; }
+.tl input[type=checkbox] { accent-color: var(--accent); width: 18px; height: 18px; margin-top: 4px; flex: 0 0 auto; }
+.tl.done .what > :not(label) { opacity: .6; }
+.cal { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.cal div { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; font-size: .92rem; line-height: 1.3; background: var(--bg); }
+.cal b { font-family: var(--font-caps); font-weight: 400; letter-spacing: .08em; font-size: .72rem; color: var(--accent); display: block; margin-bottom: 2px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { border: 1px solid var(--ink); background: var(--ink); color: var(--bg); border-radius: var(--radius); padding: 8px 16px; font-family: var(--font-caps); letter-spacing: .08em; font-size: .82rem; }
+.btn.ghost { background: transparent; color: var(--ink); }
+.toast { font-size: .95rem; color: var(--accent); align-self: center; }
+.saved { display: grid; gap: 6px; }
+.saved-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 6px; font-size: .98rem; flex-wrap: wrap; }
+.saved-row span { min-width: 0; overflow-wrap: anywhere; }
+.empty { color: var(--muted); font-style: italic; }
+.key { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .9rem; color: var(--muted); }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 20px 36px; color: var(--muted); font-size: .92rem; display: grid; gap: 6px; max-width: 900px; margin: 0 auto; }
+
+dialog { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink); padding: 0; width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
+dialog::backdrop { background: rgba(20,26,48,.55); }
+.dlg { padding: 22px 24px 24px; display: grid; gap: 14px; }
+.dlg-head { display: grid; grid-template-columns: 76px minmax(0,1fr) auto; gap: 14px; align-items: center; }
+.dlg-head .med { width: 76px; height: 76px; border-radius: 50%; background: var(--medallion); display: grid; place-items: center; }
+.dlg-head img { width: 72px; }
+.dlg dl { display: grid; grid-template-columns: max-content minmax(0,1fr); gap: 6px 14px; margin: 0; font-size: 1rem; }
+.dlg dt { font-family: var(--font-caps); letter-spacing: .08em; font-size: .72rem; color: var(--accent); padding-top: 4px; }
+.dlg dd { margin: 0; }
+@media (max-width: 520px) { .dlg dl { grid-template-columns: minmax(0,1fr); } .dlg dt { padding-top: 6px; } .tl { grid-template-columns: minmax(0,1fr); gap: 4px; } }
+.jump { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 20; display: flex; align-items: center; gap: 10px; max-width: calc(100vw - 32px); background: var(--band); color: var(--band-ink); border: 1px solid var(--band-accent); border-radius: 999px; padding: 10px 18px 10px 10px; box-shadow: 0 6px 20px rgba(20,26,48,.35); font-family: var(--font-caps); letter-spacing: .06em; font-size: .9rem; }
+.jump .sig { display: flex; }
+.jump .sig img { width: 30px; height: 30px; border-radius: 50%; background: var(--medallion); margin-right: -8px; border: 2px solid var(--band); }
+.jump .lbl { margin-left: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg { display: inline-flex; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 3px 14px; font-family: var(--font-caps); letter-spacing: .08em; font-size: .78rem; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.lock { display: inline-block; font-family: var(--font-caps); font-size: .62rem; letter-spacing: .08em; padding: 0 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); vertical-align: 2px; white-space: nowrap; font-style: normal; }
+.jump[hidden] { display: none; }
+.backlink { display: none; }
+@media (min-width: 1000px) { .jump { display: none !important; } }
+@media (max-width: 999px) { .backlink { display: inline; } main.wrap { padding-bottom: 96px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <div class="rule"></div>
+    <div class="titlerow">
+      <div>
+        <div class="sub" id="bandSub">A companion to From Hearth to Ecstasy</div>
+        <h1 id="bandTitle">Hearth &amp; Altar</h1>
+      </div>
+      <p class="tagline">Build a personal altar for one god or several, from a single object on a windowsill to a dedicated space, with the practice to keep it.</p>
+    </div>
+    <div class="frieze" id="frieze" aria-label="Quick pick a deity"></div>
+    <div class="rule"></div>
+  </div>
+</header>
+<div class="notice"><div class="wrap">
+  <span><strong>Preview.</strong> See the app as a free visitor or as a paying member.</span>
+  <span class="seg" role="group" aria-label="Preview as"><button id="viewFree" aria-pressed="true">Free</button><button id="viewPaid" aria-pressed="false">Paid</button></span>
+  <span id="viewNote">Free shows the first words of each passage from the book, with its chapter. Options marked <span class="full">Full edition</span> are also planned for the paid tier.</span>
+</div></div>
+
+<main class="wrap">
+  <div class="steps">
+    <section class="step" aria-labelledby="s1">
+      <div class="stephead"><span class="num">I</span><h2 id="s1">Choose your gods</h2></div>
+      <div class="pantheons" id="pantheons"></div>
+      <div class="hint">What are you bringing to the altar? Pick a need to see which gods the book connects to it, or skip straight to the gods.</div>
+      <div class="needs" id="needs"></div>
+      <div class="deities" id="deities"></div>
+      <div class="selrow" id="selrow"></div>
+    </section>
+    <section class="step" aria-labelledby="s2">
+      <div class="stephead"><span class="num">II</span><h2 id="s2">Choose your space</h2></div>
+      <div class="options" id="spaces"></div>
+    </section>
+    <section class="step" aria-labelledby="s3">
+      <div class="stephead"><span class="num">III</span><h2 id="s3">Choose how long</h2></div>
+      <div class="options" id="durations"></div>
+    </section>
+    <section class="step" aria-labelledby="s4">
+      <div class="stephead"><span class="num">IV</span><h2 id="s4">Your saved altars</h2></div>
+      <div class="hint">Saved altars stay in this browser on this device.</div>
+      <div class="saved" id="saved"></div>
+    </section>
+  </div>
+
+  <aside class="plan" id="planBox" aria-label="Your altar plan"><div class="plan-inner" id="plan"></div></aside>
+</main>
+
+<footer><div class="wrap">
+  <p>Altar items, invocations, practices, reflections and sigils come from <em>From Hearth to Ecstasy: A Devotional History of the Greek Gods</em> by T. Smith. As the book says, the devotional and ritual material is original creative work, not a claim of religious authority or a guarantee of any particular outcome.</p>
+  <p>Labels: <span class="src book">Book</span> the book's own practice. <span class="src hist">History</span> ancient practice the book documents. <span class="src draft">Draft</span> structure added by the app, for the author's review.</p>
+</div></footer>
+
+<button class="jump" id="jump" hidden></button>
+<dialog id="profile"><div class="dlg" id="profileBody"></div></dialog>
+
+<script>
+/* ---------- Content: everything below is data, so a new pantheon is a new entry, not new code. ---------- */
+const SIGILS = /*SIGILS*/{};
+
+// Access tiers for the paid edition. In "preview" every option is usable; "free" would limit to the free set.
+const ACCESS = { mode: "preview", freeDeityLimit: 1 };
+
+// Needs are shared across pantheons; each deity lists the needs it answers.
+const NEEDS = [
+  { id: "home", label: "Home and steadiness" },
+  { id: "nourish", label: "Nourishment and plenty" },
+  { id: "passage", label: "Safe passage" },
+  { id: "promise", label: "Keeping commitments" },
+  { id: "endings", label: "Endings and grief" },
+  { id: "anger", label: "Anger and courage" },
+  { id: "decide", label: "Clear decisions" },
+  { id: "craft", label: "Craft and work" },
+  { id: "healing", label: "Clarity and healing" },
+  { id: "threshold", label: "Thresholds and change" },
+  { id: "love", label: "Love and connection" },
+  { id: "release", label: "Release and joy" }
+];
+
+const SPACES = [
+  { id: "sill", label: "A single object", where: "Windowsill, nightstand, desk corner", desc: "One object for each god. The smallest altar the book describes.", access: "free" },
+  { id: "shelf", label: "A corner shelf", where: "One shelf or a corner that stays", desc: "The book's own altar for each god: a small, permanent corner.", access: "free" },
+  { id: "table", label: "A table altar", where: "A side table or dresser top", desc: "The book's altar plus each god's sigil drawn by hand, on a cloth.", access: "full" },
+  { id: "room", label: "A dedicated space", where: "A room, alcove or garden", desc: "Everything above with each god's symbols, a low place for chthonic gods, and a wall calendar.", access: "full" }
+];
+
+const DURATIONS = [
+  { id: "once", label: "A single moment", desc: "Thirty seconds to a minute. The book's shortest practice for each god.", access: "free" },
+  { id: "sitting", label: "One sitting", desc: "About ten to twenty minutes: open, invoke, offer, reflect, close.", access: "free" },
+  { id: "week", label: "Seven days", desc: "Set up, a small daily practice, and a deeper close on day seven.", access: "full" },
+  { id: "moon", label: "One lunar month", desc: "New moon to new moon, starting on the Noumenia.", access: "full" },
+  { id: "year", label: "A year of observance", desc: "Monthly practice plus each god's ancient festivals by season.", access: "full" }
+];
+
+const PANTHEONS = [
+  {
+    id: "greek", name: "Greek", book: "From Hearth to Ecstasy", status: "ready",
+    // Per-pantheon palette. Greek uses the stylesheet defaults; later pantheons supply their own tokens here.
+    theme: null,
+    // Rules from the book that apply to the whole pantheon when several gods share an altar.
+    rules: {
+      first: "hestia",
+      firstText: "Hestia first, Hestia last. The book records the ancient custom of giving Hestia the first and last portion of every offering, to any god, so her share opens and closes the rite.",
+      low: ["hades"],
+      lowText: "Keep Hades's objects somewhere low rather than at eye level. The book notes ancient chthonic rites used honey rather than wine, turned palms toward the earth, and avoided incense, whose smoke rises."
+    },
+    pairs: [
+      { a: "hestia", b: "hermes", text: "The Homeric Hymn to Hestia pairs her with Hermes at the hearth's threshold: the settled and the mobile, asked to dwell in the house together." },
+      { a: "apollo", b: "dionysus", text: "At Delphi, Apollo was said to leave each winter and hand the sanctuary to Dionysus: measured reason for three seasons, ecstasy for the fourth." },
+      { a: "athena", b: "hephaestus", text: "The Chalceia was nominally their shared festival of craft, though the offering records name only Athena. The Hymn to Hephaestus has them teaching crafts together." },
+      { a: "demeter", b: "hades", text: "Persephone binds them: Demeter's grief and Hades's pomegranate seed together make the turning of the seasons." },
+      { a: "zeus", b: "hera", text: "The Daedala reenacted their quarrel and reconciliation, ending with heifers for Hera and bulls for Zeus." },
+      { a: "ares", b: "aphrodite", text: "Their affair ended in Hephaestus's net, but it also produced Harmonia." },
+      { a: "hephaestus", b: "aphrodite", text: "Husband and wife, whose marriage collapsed publicly after the net. Give them room on a shared altar." },
+      { a: "athena", b: "poseidon", text: "Rivals for Athens: her olive tree beat his spring. The olive belongs to Athena, not to him." },
+      { a: "apollo", b: "artemis", text: "Twins, children of Leto, born on Delos." },
+      { a: "hestia", b: "dionysus", text: "The book's closing chapter: Dionysus came to fill the twelfth seat in later depictions as Hestia, who does not process, dropped out of them." }
+    ],
+    deities: [
+      { id: "hestia", name: "Hestia", ch: 1, pron: "HESS-tee-uh", line: "The hearth. The first fire. The need that comes before every other need.",
+        sigil: "A single unbroken circle with a small flame at its center. Draw it by hand, imperfectly. It's meant to look kept, not crafted.",
+        domain: "Hearth, home, the fire of family and state", short: "Hearth and home", animal: "Donkey", plant: "None well attested in ancient sources", symbol: "The hearth fire itself; a seated, veiled figure",
+        asked: "The safety and continuity of the household: a fire that kept burning, a family fed and sheltered",
+        needs: ["home", "nourish"],
+        quick: "Say the invocation once, out loud or silently, before you cook or before everyone sits down to eat.",
+        invocation: "Hestia, first and last, keeper of the flame that does not travel, teach me the stillness at the center of the turning. Let what I tend outlast what I chase.",
+        altar: [{ t: "A candle, lit at the start of a meal or a gathering and blown out at its end", g: "candle" }],
+        altarNote: "A small, permanent space, not one assembled and dismantled for ritual, but a corner that stays. No elaborate décor; Hestia's whole character is restraint.",
+        upkeep: ["Light the candle at the start of a meal or gathering and blow it out at its end.", "Leave the corner in place between practices. It is meant to stay."],
+        large: { t: "The hearth fire itself, or a seated, veiled figure", g: "figure" },
+        reflect: { quick: "What in your life functions like Hestia's hearth: the constant, unglamorous thing that everything else is built around, and that you rarely think to thank? What would it cost you if it went out?", deeper: "Where in your life have you mistaken quiet, sustaining work for something unimportant, simply because it never asked for credit or attention?" },
+        hymn: { text: "For without you mortals hold no banquet, where one does not duly pour sweet wine in offering to Hestia both first and last.", src: "Homeric Hymn 29, trans. Evelyn-White" },
+        fest: [{ n: "Noumenia", when: "First day of every lunar month", m: -1 }, { n: "Amphidromia", when: "Fifth or seventh day after a birth", m: null }] },
+      { id: "demeter", name: "Demeter", ch: 2, pron: "dih-MEE-ter", line: "Demeter is the fear that this year's harvest might be the last one.",
+        sigil: "A single stalk of wheat, drawn as a straight line with a few short strokes branching off it, set inside an unbroken circle. Draw the grain heads uneven.",
+        domain: "Harvest, cultivated grain, fertility of the earth", short: "Harvest and grain", animal: "Pig", plant: "Wheat and barley; poppy", symbol: "Sheaf of wheat, cornucopia, torch",
+        asked: "A good harvest, protection from famine, fertility of the land, fertility of their own bodies",
+        needs: ["nourish", "endings"],
+        quick: "Before you eat bread today, break off a small piece and set it aside rather than eating it.",
+        invocation: "Demeter, who gives and who withholds, teach me that grief and growth share a root. What I have lost, let it feed what comes next. What I am given, let me not take for granted.",
+        altar: [{ t: "A small dish for grain, seeds, or a piece of bread", g: "dish" }],
+        altarNote: "If you cook or garden at all, this is an easy one to fold into something you already do.",
+        upkeep: ["Replace the grain or bread regularly rather than leaving it to go stale."],
+        large: { t: "A sheaf of wheat, a cornucopia or a torch; poppies", g: "branch" },
+        reflect: { quick: "What have you had to let go of in order for something else to grow?", deeper: "Demeter's grief was not gentle. It stopped the harvest of an entire world. Where in your life have you underestimated how much room real grief needs, or tried to keep producing through it anyway?" },
+        hymn: { text: "Lady, giver of good gifts, bringer of seasons, queen Deo, be gracious, you and your daughter all beauteous Persephone.", src: "Homeric Hymn to Demeter, trans. Evelyn-White" },
+        fest: [{ n: "Eleusinian Mysteries", when: "September (Boedromion)", m: 8 }, { n: "Thesmophoria", when: "Mid-to-late October (Pyanepsion)", m: 9 }] },
+      { id: "poseidon", name: "Poseidon", ch: 3, pron: "poh-SY-dun", line: "The ground itself can fail too, and so can the sea that feeds you and drowns you in the same afternoon.",
+        sigil: "A trident: one straight shaft, three curved tines, a crossbar near the base, inside an unbroken circle. Let the tines be uneven if your hand isn't steady.",
+        domain: "The sea, earthquakes, horses", short: "Sea, earthquake, horses", animal: "Horse, bull, dolphin", plant: "None specifically his; the olive belongs to Athena", symbol: "Trident",
+        asked: "Safe passage across water, protection from shipwreck and earthquakes, strong horses",
+        needs: ["passage"],
+        quick: "Before you do something you can't fully control the outcome of, a trip, a decision, a conversation, say a short line of your own asking for safe passage.",
+        invocation: "Poseidon, whose ground moves and whose sea does not hold still, I don't ask you to calm anything. I ask for steadiness enough to move through what I can't control, and the sense to respect what I can't.",
+        altar: [{ t: "A small dish of salt water, changed regularly", g: "dish" }, { t: "Or a smooth stone taken from a shoreline", g: "stone" }, { t: "Anything with a horse motif you already keep", g: "figure" }],
+        upkeep: ["Change the salt water regularly."],
+        large: { t: "A trident; a horse, bull or dolphin", g: "figure" },
+        reflect: { quick: "What in your life right now feels like weather: real, powerful, and completely outside your control?", deeper: "Poseidon lost the contest for Athens and, by most accounts, did not lose it well. Where have you responded badly to being passed over, and what would it have looked like to lose with more grace than he did?" },
+        hymn: { text: "Hail, Poseidon, Holder of the Earth, dark-haired lord! O blessed one, be kindly in heart and help those who voyage in ships!", src: "Homeric Hymn 22, trans. Evelyn-White" },
+        fest: [{ n: "Poseidea", when: "8th of Poseideon, mid-December to mid-January", m: 11 }, { n: "Isthmian Games", when: "Spring, every two years", m: 3 }] },
+      { id: "zeus", name: "Zeus", ch: 4, pron: "zoos", line: "Someone had to be in charge of all of it, or none of it made sense.",
+        sigil: "A thunderbolt, drawn as one jagged zigzag stroke, inside an unbroken circle. Keep the angles sharp and a little uneven. It should look struck, not stenciled.",
+        domain: "The sky, weather, law, oaths, kingship", short: "Sky, law, oaths", animal: "Eagle, bull", plant: "Oak", symbol: "Thunderbolt, aegis",
+        asked: "Justice, enforcement of oaths, protection for travelers and guests, favorable weather, legitimacy for rulers",
+        needs: ["promise", "passage"],
+        quick: "When you make a promise today, however small, pause and actually mean it before you say it.",
+        invocation: "Zeus, who holds the sky over everything else, I don't ask you to make my choices for me. I ask for the clarity to keep the commitments I make, and the humility to answer for the ones I break.",
+        altar: [{ t: "An oak leaf or an acorn", g: "leaf" }, { t: "Or a small object that stands for a promise you're currently keeping", g: "ring" }],
+        altarNote: "Nothing elaborate. What matters is that it's honest.",
+        upkeep: ["Keep it honest: if the promise it stands for ends, let the object change with it."],
+        large: { t: "An eagle; oak; a thunderbolt", g: "figure" },
+        reflect: { quick: "What's one commitment in your life right now that you've been treating more casually than you should?", deeper: "Zeus enforced oaths in others while breaking plenty of his own, particularly to Hera. Where in your life do you hold other people to a standard you don't fully hold yourself to?" },
+        hymn: { text: "I will sing of Zeus, chiefest among the gods and greatest, all-seeing, the lord of all.", src: "Homeric Hymn 23, trans. Evelyn-White" },
+        fest: [{ n: "Olympic Games", when: "Late August or early September, every four years", m: 7 }] },
+      { id: "hera", name: "Hera", ch: 5, pron: "HAIR-uh", line: "Once someone is in charge, the next question is who they're bound to, and what holds that bond together.",
+        sigil: "A crown, drawn as three peaks over a straight base line, inside an unbroken circle. Keep the peaks slightly uneven. Authority that's earned looks a little worn.",
+        domain: "Marriage, women, family, childbirth", short: "Marriage and family", animal: "Cow; the peacock is a later, largely Roman association", plant: "Pomegranate", symbol: "Diadem or crown, scepter",
+        asked: "Legitimacy and protection in marriage, safe childbirth, household stability, justice against betrayal",
+        needs: ["promise", "love", "home"],
+        quick: "Name one relationship in your life, romantic or not, and do one small, concrete thing today to honor what you've actually committed to it.",
+        invocation: "Hera, who is owed more than a feeling, I ask for the clarity to see what my commitments actually require of me, and the steadiness to give it even on the days it isn't easy.",
+        altar: [{ t: "A pomegranate, fresh or a small carved or painted one", g: "fruit" }, { t: "Or a plain band or ring that represents a commitment you keep", g: "ring" }],
+        altarNote: "Nothing needs to be elaborate or bought for this.",
+        upkeep: ["Replace a fresh pomegranate before it spoils, or keep a carved or painted one."],
+        large: { t: "A crown or diadem, a scepter; a cow", g: "figure" },
+        reflect: { quick: "Where in your life are you offering feeling without follow-through, the sentiment of commitment without its substance?", deeper: "Hera is often reduced to her jealousy, but her myths are just as much about what a broken vow costs everyone around it. Where has someone else's broken commitment shaped your life, and how has that shaped what you expect from your own?" },
+        hymn: { text: "I sing of golden-throned Hera whom Rhea bare. Queen of the immortals is she, surpassing all in beauty.", src: "Homeric Hymn 12, trans. Evelyn-White" },
+        fest: [{ n: "Heraean Games", when: "At Olympia, every four years", m: null }, { n: "Daedala", when: "Plataea, roughly every four years; the Greater every sixty", m: null }] },
+      { id: "hades", name: "Hades", ch: 6, pron: "HAY-deez", line: "Someone has to govern what's on the other side, or it stays a formless kind of fear instead of a place with rules.",
+        sigil: "A key: a small circle for the bow, a straight shaft, one or two teeth at the base, inside an unbroken circle. It should look like it locks something, not like it opens something.",
+        domain: "The underworld and the dead; buried wealth and minerals as Plouton", short: "The underworld", animal: "Cerberus, his own hound", plant: "Cypress, narcissus", symbol: "Key, cornucopia (as Plouton)",
+        asked: "Rarely petitioned directly; more often placated or avoided",
+        needs: ["endings"],
+        quick: "Name, silently or aloud, one thing you're avoiding thinking about because it involves an ending. Don't solve it. Just name it.",
+        invocation: "Hades, who governs what I can't undo and can't outrun, I don't ask you to spare me from endings. I ask for the honesty to face the ones already in front of me, instead of pretending they're not there.",
+        altar: [{ t: "A single dark stone", g: "stone" }, { t: "A cypress sprig, if you can find one", g: "branch" }, { t: "Or a key that no longer opens anything you own", g: "key" }],
+        upkeep: ["Keep it low, below eye level."],
+        large: { t: "Narcissus; a cornucopia for Hades as Plouton", g: "branch" },
+        reflect: { quick: "What ending in your life are you currently pretending isn't coming?", deeper: "Hades is often the most feared god and, in the actual myths, one of the least cruel. Where in your life have you let fear of a thing stand in for an honest look at what the thing actually is?" },
+        hymn: { text: "Go now, Persephone, to your dark-robed mother, go, and feel kindly in your heart towards me.", src: "Hades, in the Homeric Hymn to Demeter, trans. Evelyn-White" },
+        fest: [{ n: "Chthonic rites", when: "No fixed festival; whenever the situation called for them", m: null }] },
+      { id: "ares", name: "Ares", ch: 7, pron: "AIR-eez", line: "Some of it people bring on each other, on purpose, right now, and that has to be reckoned with separately.",
+        sigil: "A spear: a single shaft with a simple triangular point and a short crossbar near the base, inside an unbroken circle. Keep it plain.",
+        domain: "War, its violence and chaos rather than strategy", short: "War's raw force", animal: "Vulture, dog, boar", plant: "None specifically his", symbol: "Spear, helmet, shield",
+        asked: "Raw battle-courage or ferocity for a specific coming fight",
+        needs: ["anger"],
+        quick: "Before you respond to whatever's provoking you today, take one breath longer than feels necessary.",
+        invocation: "Ares, whose fury I recognize in myself sometimes, I don't ask you to make me fiercer. I ask for the discipline to use whatever anger I'm carrying instead of being used by it.",
+        altar: [{ t: "Something plain and unglamorous: a stone, a nail, a scrap of iron", g: "tool" }],
+        altarNote: "Nothing meant to look impressive. This isn't a god who responds to decoration.",
+        upkeep: ["Keep it plain. Don't add decoration."],
+        large: { t: "A spear, helmet or shield, plain military gear", g: "tool" },
+        reflect: { quick: "Where in your life has raw force, anger, or aggression gotten you further, or cost you more, than a more strategic response would have?", deeper: "Ares was distrusted even by his own family, in part because his violence had no strategy behind it. Where in your own conflicts are you all force and no plan?" },
+        hymn: { text: "Give you me boldness to abide within the harmless laws of peace, avoiding strife and hatred.", src: "Homeric Hymn 8 (authorship disputed), trans. Evelyn-White" },
+        fest: [{ n: "Ares Gynaecothoenas", when: "No fixed date; a local Tegean cult", m: null }] },
+      { id: "athena", name: "Athena", ch: 8, pron: "uh-THEE-nuh", line: "Someone has to think ahead, plan the defense before the attack, and know when not to fight at all.",
+        sigil: "An owl's face: two round eyes, a small triangular beak, and two short tufts at the top like ears, inside an unbroken circle. Keep the eyes wide and steady.",
+        domain: "Wisdom, strategic warfare, civic order, craft", short: "Wisdom and strategy", animal: "Owl, serpent", plant: "Olive tree", symbol: "Aegis, gorgoneion, spear",
+        asked: "Wisdom in judgment and counsel, protection for the city, skill in craft and weaving, victory through strategy",
+        needs: ["decide", "craft", "anger"],
+        quick: "Before reacting to a problem today, ask yourself what the smartest response would be, not just the fastest one. Then take a breath and do that instead.",
+        invocation: "Athena, whose strength is in her thinking, I don't ask you to fight my battles. I ask for the clarity to see the whole board before I make my move.",
+        altar: [{ t: "An olive branch or a small dish of olive oil", g: "branch" }, { t: "Something that represents a skill you're actively building", g: "tool" }, { t: "A small owl figure, if you have one", g: "figure" }],
+        upkeep: ["Keep the object for your skill current with what you're actually building."],
+        large: { t: "An owl; olive; the aegis or gorgoneion", g: "figure" },
+        reflect: { quick: "What decision in your life right now would benefit from more strategy and less speed?", deeper: "Athena couldn't tolerate being outdone by Arachne, a mortal with no claim to divine status. Where in your own life does your competence turn into a need to always be the best in the room?" },
+        hymn: { text: "I begin to sing of Pallas Athene, the glorious goddess, bright-eyed, inventive, unbending of heart.", src: "Homeric Hymn 28, trans. Evelyn-White" },
+        fest: [{ n: "Panathenaea", when: "28th of Hekatombaion, roughly midsummer", m: 6 }, { n: "Arrhephoria", when: "Annually, date uncertain", m: null }] },
+      { id: "hephaestus", name: "Hephaestus", ch: 9, pron: "heh-FES-tuss", line: "Wisdom can plan the city. It still needs someone to build the walls and forge the tools.",
+        sigil: "A hammer: a rectangular head over a straight handle, inside an unbroken circle. Keep the proportions a little heavy. This is a working tool, not a decoration.",
+        domain: "Fire, metalworking, craft", short: "Fire and the forge", animal: "None specifically his", plant: "None specifically his", symbol: "Hammer, anvil, tongs",
+        asked: "Skill and success in craftsmanship, protection for artisans, competence in making things well",
+        needs: ["craft"],
+        quick: "Take one thing today that's half-finished and do the next concrete step on it.",
+        invocation: "Hephaestus, who works with what's actually in front of him, I don't ask for talent I don't have. I ask for the patience to keep making things well, even the parts nobody applauds.",
+        altar: [{ t: "A small tool you actually use: a hand tool, a needle, whatever fits your own craft", g: "tool" }],
+        altarNote: "Kept somewhere visible rather than put away.",
+        upkeep: ["Keep the tool visible rather than put away, and keep using it."],
+        large: { t: "A hammer, anvil or tongs", g: "tool" },
+        reflect: { quick: "What's something in your life you've been avoiding simply because it requires unglamorous, repetitive effort?", deeper: "Hephaestus was mocked by other gods for his appearance and, in the Chalceia, effectively erased from his own festival. Where have you kept contributing real value to something that didn't credit you for it, and how do you feel about that now?" },
+        hymn: { text: "Be gracious, Hephaestus, and grant me success and prosperity!", src: "Homeric Hymn 20, trans. Evelyn-White" },
+        fest: [{ n: "Hephaesteia", when: "Spring, in Athens", m: 3 }, { n: "Chalceia", when: "Last day of Pyanepsion, late October", m: 9 }] },
+      { id: "apollo", name: "Apollo", ch: 10, pron: "uh-POL-oh", line: "Someone who can heal what's broken and say what's coming before it arrives.",
+        sigil: "A lyre: two curved arms rising from a shallow base, with three strings between them, inside an unbroken circle. Keep the curves loose rather than mechanical.",
+        domain: "Prophecy, music and poetry, healing, archery; later, the sun", short: "Prophecy, music, healing", animal: "Raven, swan", plant: "Laurel", symbol: "Lyre, bow",
+        asked: "Guidance and prophecy, healing from illness, success in music and poetry",
+        needs: ["healing", "decide"],
+        quick: "Ask yourself one honest question about something you've been avoiding looking at clearly, and sit with the answer for a moment, even if you don't act on it yet.",
+        invocation: "Apollo, who sees further than the moment I'm standing in, I don't ask you to tell me the future. I ask for the clarity to see my present situation as it actually is.",
+        altar: [{ t: "A laurel leaf", g: "leaf" }, { t: "A small musical instrument or a guitar pick", g: "figure" }, { t: "Or anything connected to a healing practice you maintain", g: "jar" }],
+        upkeep: [],
+        large: { t: "A lyre or bow; a raven or swan", g: "figure" },
+        reflect: { quick: "What's one area of your life where you'd rather stay vague than get a clear, possibly uncomfortable answer?", deeper: "The Pythia's words needed priests to interpret them before anyone could act on them. Where in your own life are you relying on someone else to interpret a truth you could look at directly yourself?" },
+        hymn: { text: "I will remember and not be unmindful of Apollo who shoots afar.", src: "Homeric Hymn 3, trans. Evelyn-White" },
+        fest: [{ n: "Delphic Oracle", when: "Once a month, nine months of the year", m: -1 }, { n: "Pythian Games", when: "At Delphi, every four years", m: null }] },
+      { id: "artemis", name: "Artemis", ch: 11, pron: "AR-teh-miss", line: "Someone else has to guard the edges: the wild places, the threshold nobody's watching.",
+        sigil: "A bow: a single curved arc with a straight bowstring, an arrow nocked and pointing outward, inside an unbroken circle. Let the curve be slightly uneven.",
+        domain: "Wilderness, the hunt, wild animals, transitions to adulthood, childbirth", short: "The wild and its edges", animal: "Deer", plant: "Cypress", symbol: "Bow and arrow; the crescent moon is a later association",
+        asked: "Protection for young women approaching marriage and childbirth, success in hunting, protection of wild places, safe transitions",
+        needs: ["threshold"],
+        quick: "Spend two minutes outside today, actually looking at something wild or growing rather than passing by it.",
+        invocation: "Artemis, who guards the edges of things, I don't ask you to keep me from every risk. I ask for the instinct to know which wild places in my life are worth entering, and which ones aren't.",
+        altar: [{ t: "A dried leaf or small branch gathered outdoors", g: "leaf" }, { t: "An arrowhead-shaped stone", g: "stone" }, { t: "Or a small carved deer", g: "figure" }],
+        upkeep: ["Gather the leaf or branch outdoors yourself, and replace it when you go out again."],
+        large: { t: "A bow and arrow; a deer; cypress", g: "figure" },
+        reflect: { quick: "What edge or threshold in your life are you standing at right now without fully admitting it?", deeper: "Actaeon's punishment for accidentally seeing something forbidden was total and immediate. Where in your own life have you judged someone else's mistake more harshly than you'd judge the same mistake in yourself?" },
+        hymn: { text: "Muse, sing of Artemis, sister of the Far-shooter, the virgin who delights in arrows.", src: "Homeric Hymn 9, trans. Evelyn-White" },
+        fest: [{ n: "Brauronia and Arkteia", when: "At Brauron, roughly every four years", m: null }, { n: "Artemis Orthia", when: "Annually, at Sparta", m: null }] },
+      { id: "aphrodite", name: "Aphrodite", ch: 12, pron: "af-roh-DY-tee", line: "A city still needs a reason to want to keep living at all, some pull toward another person.",
+        sigil: "A scallop shell: a rounded fan of simple radiating lines inside a curved outline, inside an unbroken circle. Keep the lines a little irregular, like something the sea actually shaped.",
+        domain: "Love, desire, beauty, social cohesion", short: "Love and desire", animal: "Dove, sparrow", plant: "Myrtle, rose", symbol: "The kestos (girdle), seashell",
+        asked: "Success in romantic love, beauty and desirability, social harmony, fertility in a broader sense",
+        needs: ["love"],
+        quick: "Tell someone you care about, in one direct sentence, something specific you appreciate about them.",
+        invocation: "Aphrodite, who makes connection worth the risk it always carries, I don't ask you to make me irresistible. I ask for the courage to be genuinely seen by someone else.",
+        altar: [{ t: "A seashell", g: "shell" }, { t: "A small mirror", g: "ring" }, { t: "Or fresh flowers, changed regularly", g: "branch" }],
+        upkeep: ["Change the flowers regularly."],
+        large: { t: "A dove; myrtle or roses", g: "branch" },
+        reflect: { quick: "Where in your life have you been withholding real affection out of fear of how it might be received?", deeper: "Aphrodite's affair with Ares became a public spectacle when Hephaestus exposed it. Where in your own relationships has private vulnerability been made public in a way that still stings to think about?" },
+        hymn: { text: "Muse, tell me the deeds of golden Aphrodite the Cyprian, who stirs up sweet passion in the gods.", src: "Homeric Hymn 5, trans. Evelyn-White" },
+        fest: [{ n: "Aphrodisia", when: "Hekatombaion, mid-July to mid-August", m: 6 }] },
+      { id: "hermes", name: "Hermes", ch: 13, pron: "HER-meez", line: "Something still has to carry the message between them, and between every other boundary a person crosses.",
+        sigil: "A staff with two winged tips at the top and two serpents winding around its length, inside an unbroken circle. Keep the coils loose and overlapping.",
+        domain: "Boundaries, travel, communication, trade, guiding the dead", short: "Boundaries and travel", animal: "Tortoise, rooster", plant: "None specifically his", symbol: "Caduceus, winged sandals, traveler's hat",
+        asked: "Safe travel and passage across boundaries, success in trade, eloquence in negotiation, safe conduct for the dead",
+        needs: ["passage", "threshold"],
+        quick: "Before you cross a threshold today, literal or otherwise, a doorway, a decision, a difficult conversation, pause for one breath and notice that you're crossing it.",
+        invocation: "Hermes, who moves between places I can't move between myself, I don't ask you to make the crossing easy. I ask for the wit to handle whatever's on the other side.",
+        altar: [{ t: "A small stone from a crossroads or a journey", g: "stone" }, { t: "Or a well-worn traveling item: a set of keys, a compass, a pair of shoes kept for that purpose", g: "key" }],
+        upkeep: [],
+        large: { t: "A caduceus, winged sandals or a traveler's hat", g: "figure" },
+        reflect: { quick: "What boundary or threshold in your life are you standing at right now without fully crossing it?", deeper: "Hermes talked his way out of serious consequences for theft on the day he was born. Where in your own life has charm or cleverness let you avoid a reckoning you probably needed?" },
+        hymn: { text: "Muse, sing of Hermes, the son of Zeus and Maia, the luck-bringing messenger of the immortals.", src: "Homeric Hymn 4, trans. Evelyn-White" },
+        fest: [{ n: "Hermaea", when: "Many places, no single date", m: null }] },
+      { id: "dionysus", name: "Dionysus", ch: 14, pron: "dee-oh-NY-sos", line: "Wine, ecstasy, theater, and the dissolving of ordinary boundaries all answered to him.",
+        sigil: "A fennel staff crowned with a pinecone, wound with curling ivy tendrils along its length, set inside an unbroken circle.",
+        domain: "Wine, ecstasy, theater, ritual madness, the vine", short: "Wine, theater, ecstasy", animal: "Panther, leopard, bull", plant: "Grapevine, ivy", symbol: "Thyrsus, kantharos (wine cup)",
+        asked: "Release from ordinary self-control, a good vintage, protection for actors and playwrights, ecstatic communion",
+        needs: ["release"],
+        quick: "Before you eat or drink something today, pause for one breath and let yourself actually taste it, rather than consuming it on autopilot.",
+        invocation: "Dionysus, who loosens what holds too tight, I don't ask you to take away my judgment. I ask for one evening where I don't need it — and the sense to know when that evening is over.",
+        altar: [{ t: "A cluster of grapes or a small glass of wine (or grape juice)", g: "cup" }, { t: "A sprig of ivy", g: "leaf" }, { t: "A ticket stub or program from a play, concert, or other live performance, kept for that purpose", g: "card" }],
+        upkeep: ["Replace grapes or wine before they turn."],
+        large: { t: "A thyrsus; a kantharos; a panther or leopard", g: "figure" },
+        reflect: { quick: "Where in your life could you use a sanctioned, structured release rather than the unstructured kind you're currently taking?", deeper: "Dionysus is remembered by name and myth; Hestia, arguably more faithfully served, is remembered by absence. What in your own life gets the least credit precisely because it's the most constant?" },
+        hymn: { text: "The father of gods and men bore him far from men, hiding him from white-armed Hera.", src: "Homeric Hymn 1, trans. after Evelyn-White" },
+        fest: [{ n: "Anthesteria", when: "Anthesterion, roughly February", m: 1 }, { n: "City Dionysia", when: "Spring, in Athens", m: 2 }] }
+    ]
+  },
+  // Later books. Each becomes "ready" once it has deities, a palette and sigils.
+  { id: "norse", name: "Norse", status: "planned", deities: [] },
+  { id: "egyptian", name: "Egyptian", status: "planned", deities: [] }
+];
+
+/* Upkeep that the app adds by space (not from the book). */
+const SPACE_UPKEEP = {
+  sill: ["Dust it and check it whenever you pass; a single object is easy to forget."],
+  shelf: ["Once a week, refresh anything perishable and dust the shelf."],
+  table: ["Once a week, refresh anything perishable and straighten the cloth.", "Once a month, clear the table completely, wash the dishes and cloth, and set it again."],
+  room: ["Once a week, refresh anything perishable.", "Once a month, clear and clean the whole space and reset it.", "At each god's festival season, re-dress their part of the altar."]
+};
+
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+/* ---------- State ---------- */
+const state = { pantheon: "greek", need: null, deities: ["hestia", "demeter"], space: "shelf", duration: "sitting", progress: {}, example: true };
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const P = () => PANTHEONS.find((p) => p.id === state.pantheon);
+const D = (id) => P().deities.find((d) => d.id === id);
+const src = (k) => k === "book" ? '<span class="src book">Book</span>' : k === "hist" ? '<span class="src hist">History</span>' : '<span class="src draft">Draft</span>';
+// Paid split (option C): the free view shows the first words of each book passage and points to its chapter.
+let VIEW = "free";
+const TEASE_WORDS = 7;
+const lockTag = (ch) => `<span class="lock">${ch ? `Chapter ${ch}` : "In the book"} · paid</span>`;
+function tz(text, ch) {
+  if (VIEW !== "free") return esc(text);
+  const w = String(text).split(/\s+/);
+  return w.length <= TEASE_WORDS ? esc(text) + " " + lockTag(ch) : esc(w.slice(0, TEASE_WORDS).join(" ")) + "… " + lockTag(ch);
+}
+const fullTag = (o) => o.access === "full" ? '<span class="full">Full edition</span>' : "";
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+};
+
+/* Order gods on the altar: the pantheon's "first" god sits at the center, others around in the order chosen. */
+function ordered(ids) {
+  const p = P(); const list = ids.slice();
+  const first = p.rules && p.rules.first;
+  if (first && list.includes(first) && list.length > 1) {
+    const rest = list.filter((x) => x !== first);
+    const mid = Math.floor(rest.length / 2);
+    return [...rest.slice(0, mid), first, ...rest.slice(mid)];
+  }
+  return list;
+}
+
+/* ---------- Theme per pantheon ---------- */
+function applyTheme() {
+  const p = P(); let el = $("pantheonTheme");
+  if (!el) { el = document.createElement("style"); el.id = "pantheonTheme"; document.head.appendChild(el); }
+  if (!p.theme) { el.textContent = ""; return; }
+  const decl = (o) => Object.entries(o).map(([k, v]) => `--${k}:${v};`).join("");
+  el.textContent = `:root{${decl(p.theme.light)}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${decl(p.theme.dark)}}}:root[data-theme="dark"]{${decl(p.theme.dark)}}`;
+}
+
+/* ---------- Choice rendering ---------- */
+function renderPantheons() {
+  $("pantheons").innerHTML = PANTHEONS.map((p) => p.status === "ready"
+    ? `<button class="chip" aria-pressed="${p.id === state.pantheon}" data-p="${p.id}">${esc(p.name)} <small>${p.deities.length} gods</small></button>`
+    : `<button class="chip" disabled title="Planned for a later book">${esc(p.name)} <small>later book</small></button>`).join("");
+}
+function renderNeeds() {
+  const avail = new Set(P().deities.flatMap((d) => d.needs));
+  $("needs").innerHTML = NEEDS.filter((n) => avail.has(n.id)).map((n) => `<button class="chip" aria-pressed="${state.need === n.id}" data-need="${n.id}">${esc(n.label)}</button>`).join("");
+}
+function renderDeities() {
+  const p = P();
+  $("deities").innerHTML = p.deities.map((d) => {
+    const on = state.deities.includes(d.id);
+    const rec = state.need && d.needs.includes(state.need);
+    const dim = state.need && !rec && !on;
+    return `<button class="dcard${rec ? " rec" : ""}${dim ? " dim" : ""}" aria-pressed="${on}" data-d="${d.id}">
+      <span class="med"><img src="${SIGILS[d.id] || ""}" alt=""></span>
+      <span><span class="nm">${esc(d.name)}</span><span class="dm" style="display:block">${esc(d.short)}</span></span>
+    </button>`;
+  }).join("");
+  const n = state.deities.length;
+  const many = n > ACCESS.freeDeityLimit ? ' <span class="full">Full edition</span>' : "";
+  $("selrow").innerHTML = n
+    ? `<span>${n} chosen${many}.</span> ${state.deities.map((id) => `<button class="linkbtn" data-info="${id}">About ${esc(D(id).name)}</button>`).join(" · ")}${n ? ' · <button class="linkbtn" data-clear="1">Clear</button>' : ""}`
+    : "<span>Choose at least one god to start an altar.</span>";
+  $("frieze").innerHTML = p.deities.map((d) => `<button aria-pressed="${state.deities.includes(d.id)}" data-d="${d.id}" title="${esc(d.name)}"><img src="${SIGILS[d.id] || ""}" alt="${esc(d.name)}"></button>`).join("");
+}
+const spaceIcon = {
+  sill: '<svg viewBox="0 0 120 46"><rect x="30" y="2" width="60" height="34" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="60" y1="2" x2="60" y2="36" stroke="currentColor" stroke-width="1"/><rect x="22" y="36" width="76" height="5" fill="currentColor"/><circle cx="60" cy="32" r="3" fill="var(--accent)"/></svg>',
+  shelf: '<svg viewBox="0 0 120 46"><rect x="24" y="30" width="72" height="4" fill="currentColor"/><path d="M34 34v8M86 34v8" stroke="currentColor" stroke-width="2"/><circle cx="48" cy="25" r="4" fill="var(--accent)"/><rect x="58" y="18" width="5" height="12" fill="currentColor"/><circle cx="74" cy="26" r="3" fill="var(--accent)"/></svg>',
+  table: '<svg viewBox="0 0 120 46"><circle cx="60" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="18" y="26" width="84" height="4" fill="currentColor"/><path d="M24 30v16M96 30v16" stroke="currentColor" stroke-width="2"/><path d="M30 30h60v6H30z" fill="var(--accent)" opacity=".5"/><circle cx="40" cy="22" r="4" fill="var(--accent)"/><rect x="58" y="14" width="4" height="12" fill="currentColor"/><circle cx="80" cy="22" r="4" fill="var(--accent)"/></svg>',
+  room: '<svg viewBox="0 0 120 46"><path d="M8 4h104" stroke="currentColor"/><circle cx="36" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="60" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="84" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="20" y="28" width="80" height="4" fill="currentColor"/><path d="M26 32v10M94 32v10" stroke="currentColor" stroke-width="2"/><rect x="96" y="40" width="20" height="4" fill="currentColor"/><circle cx="106" cy="37" r="3" fill="var(--accent)"/><circle cx="46" cy="24" r="3" fill="var(--accent)"/><circle cx="74" cy="24" r="3" fill="var(--accent)"/></svg>'
+};
+function renderOptions() {
+  $("spaces").innerHTML = SPACES.map((s) => `<button class="opt" aria-pressed="${state.space === s.id}" data-s="${s.id}">${spaceIcon[s.id]}<span class="t">${esc(s.label)} ${fullTag(s)}</span><span class="d"><em>${esc(s.where)}.</em> ${esc(s.desc)}</span></button>`).join("");
+  $("durations").innerHTML = DURATIONS.map((t) => `<button class="opt" aria-pressed="${state.duration === t.id}" data-t="${t.id}"><span class="t">${esc(t.label)} ${fullTag(t)}</span><span class="d">${esc(t.desc)}</span></button>`).join("");
+}
+
+/* ---------- Altar contents ---------- */
+function altarItems() {
+  const p = P(); const ids = ordered(state.deities); const items = [];
+  const sp = state.space;
+  ids.forEach((id) => {
+    const d = D(id);
+    const base = sp === "sill" ? d.altar.slice(0, 1) : d.altar;
+    base.forEach((a) => items.push({ who: id, t: a.t, g: a.g, src: "book" }));
+    if (sp === "table" || sp === "room") items.push({ who: id, t: "Sigil, drawn by hand: " + d.sigil, g: "card", src: "book" });
+    if (sp === "room" && d.large) items.push({ who: id, t: "Symbols from the book's At a Glance: " + d.large.t, g: d.large.g, src: "book" });
+  });
+  const shared = [];
+  if (sp === "table" || sp === "room") shared.push({ who: null, t: "A plain cloth to set the surface apart", g: "cloth", src: "draft" });
+  if ((sp === "table" || sp === "room") && !ids.includes("hestia")) shared.push({ who: null, t: "One candle to mark the start and end of practice", g: "candle", src: "draft" });
+  if (sp === "room") shared.push({ who: null, t: "A notebook for reflections, kept on the altar", g: "card", src: "draft" }, { who: null, t: "A wall calendar marking the festivals below", g: "card", src: "draft" });
+  items.forEach((it, i) => it.n = i + 1);
+  shared.forEach((it, i) => it.n = items.length + i + 1);
+  return { items, shared };
+}
+
+/* ---------- Diagram ---------- */
+// Phones get larger objects in the drawing so it stays legible at that width.
+let SC = 1;
+function glyph(g, x, y) {
+  return `<g transform="translate(${x} ${y}) scale(${SC}) translate(${-x} ${-y})">${glyphRaw(g, x, y)}</g>`;
+}
+function glyphRaw(g, x, y) {
+  const a = "var(--accent)", k = "var(--glyph)", s = "var(--sage)";
+  switch (g) {
+    case "candle": return `<rect x="${x-5}" y="${y-30}" width="10" height="30" fill="${k}" opacity=".85"/><path d="M${x} ${y-44}c5 6 5 10 0 12c-5-2-5-6 0-12z" fill="${a}"/>`;
+    case "dish": return `<ellipse cx="${x}" cy="${y-5}" rx="18" ry="5" fill="${k}" opacity=".85"/><ellipse cx="${x}" cy="${y-8}" rx="12" ry="3" fill="${a}"/>`;
+    case "stone": return `<ellipse cx="${x}" cy="${y-7}" rx="12" ry="7" fill="${k}"/>`;
+    case "leaf": return `<path d="M${x-10} ${y-2}C${x-10} ${y-20} ${x+6} ${y-26} ${x+12} ${y-28}C${x+10} ${y-12} ${x+2} ${y-2} ${x-10} ${y-2}z" fill="${s}"/>`;
+    case "branch": return `<path d="M${x} ${y}V${y-34}" stroke="${k}" stroke-width="2"/><ellipse cx="${x-6}" cy="${y-24}" rx="6" ry="3" fill="${s}"/><ellipse cx="${x+6}" cy="${y-17}" rx="6" ry="3" fill="${s}"/><ellipse cx="${x-5}" cy="${y-10}" rx="6" ry="3" fill="${s}"/><circle cx="${x}" cy="${y-36}" r="3" fill="${a}"/>`;
+    case "fruit": return `<circle cx="${x}" cy="${y-11}" r="11" fill="${a}"/><path d="M${x-4} ${y-22}l4-5 4 5" fill="none" stroke="${k}" stroke-width="1.5"/>`;
+    case "figure": return `<rect x="${x-8}" y="${y-28}" width="16" height="28" rx="8" fill="${k}" opacity=".85"/><circle cx="${x}" cy="${y-20}" r="3" fill="${a}"/>`;
+    case "tool": return `<rect x="${x-2}" y="${y-28}" width="4" height="28" fill="${k}"/><rect x="${x-10}" y="${y-32}" width="20" height="8" fill="${k}" opacity=".8"/>`;
+    case "shell": return `<path d="M${x-14} ${y-2}A14 14 0 0 1 ${x+14} ${y-2}z" fill="${a}" opacity=".85"/><path d="M${x} ${y-2}V${y-15}M${x} ${y-2}L${x-8} ${y-12}M${x} ${y-2}L${x+8} ${y-12}" stroke="${k}" stroke-width="1"/>`;
+    case "key": return `<circle cx="${x-8}" cy="${y-6}" r="5" fill="none" stroke="${k}" stroke-width="2.5"/><path d="M${x-3} ${y-6}H${x+12}M${x+8} ${y-6}v4M${x+12} ${y-6}v4" stroke="${k}" stroke-width="2.5"/>`;
+    case "ring": return `<circle cx="${x}" cy="${y-10}" r="9" fill="none" stroke="${a}" stroke-width="3"/>`;
+    case "cup": return `<path d="M${x-10} ${y-24}h20l-4 14h-12z" fill="${k}" opacity=".85"/><rect x="${x-1.5}" y="${y-10}" width="3" height="8" fill="${k}"/><rect x="${x-7}" y="${y-2}" width="14" height="2" fill="${k}"/>`;
+    case "jar": return `<rect x="${x-8}" y="${y-22}" width="16" height="22" rx="3" fill="${k}" opacity=".8"/><rect x="${x-9}" y="${y-25}" width="18" height="4" fill="${a}"/>`;
+    case "card": return `<rect x="${x-9}" y="${y-26}" width="18" height="24" fill="var(--medallion)" stroke="${k}" stroke-width="1"/><circle cx="${x}" cy="${y-14}" r="6" fill="none" stroke="${a}" stroke-width="1.2"/>`;
+    default: return `<circle cx="${x}" cy="${y-8}" r="8" fill="${k}"/>`;
+  }
+}
+function badge(n, x, y) {
+  return `<circle cx="${x}" cy="${y}" r="${8.5 * SC}" fill="var(--ink)"/><text x="${x}" y="${y + 3.6 * SC}" text-anchor="middle" font-size="${10 * SC}" fill="var(--bg)" font-family="Marcellus, Georgia, serif">${n}</text>`;
+}
+function diagram({ items, shared }) {
+  const W = 720, H = 380, sp = state.space, p = P();
+  const ids = ordered(state.deities);
+  const lowIds = (sp === "sill" || sp === "shelf" || sp === "table" || sp === "room") ? ids.filter((id) => p.rules && p.rules.low.includes(id)) : [];
+  const mainIds = ids.filter((id) => !lowIds.includes(id));
+  const surf = { sill: 250, shelf: 230, table: 236, room: 250 }[sp];
+  const lowY = 352;
+  let g = "";
+  // furniture
+  if (sp === "sill") {
+    g += `<rect x="150" y="30" width="420" height="${surf - 30}" fill="var(--bg)" stroke="var(--wood)" stroke-width="6"/><line x1="360" y1="30" x2="360" y2="${surf}" stroke="var(--wood)" stroke-width="4"/><line x1="150" y1="${(surf + 30) / 2}" x2="570" y2="${(surf + 30) / 2}" stroke="var(--wood)" stroke-width="4"/>`;
+    g += `<rect x="120" y="${surf}" width="480" height="14" fill="var(--wood)"/>`;
+  } else if (sp === "shelf") {
+    g += `<rect x="90" y="${surf}" width="540" height="12" fill="var(--wood)"/><path d="M130 ${surf + 12}l0 26l26 -26M590 ${surf + 12}l0 26l-26 -26" stroke="var(--wood)" stroke-width="5" fill="none"/>`;
+  } else {
+    const x0 = sp === "room" ? 90 : 70, x1 = sp === "room" ? 630 : 650;
+    g += `<rect x="${x0}" y="${surf}" width="${x1 - x0}" height="12" fill="var(--wood)"/><path d="M${x0 + 30} ${surf + 12}V${H - 4}M${x1 - 30} ${surf + 12}V${H - 4}" stroke="var(--wood)" stroke-width="8"/>`;
+    g += `<path d="M${x0 + 50} ${surf + 12}h${x1 - x0 - 100}v40l-${(x1 - x0 - 100) / 2} 14l-${(x1 - x0 - 100) / 2} -14z" fill="var(--accent)" opacity=".22"/>`;
+    if (sp === "room") g += `<rect x="70" y="58" width="580" height="2" fill="var(--wood)" opacity=".6"/>`;
+  }
+  if (lowIds.length) {
+    const lx = sp === "sill" ? 600 : 640;
+    g += `<rect x="${lx - 50}" y="${lowY}" width="100" height="10" fill="var(--wood)" opacity=".9"/><text x="${lx}" y="${lowY + 14 + 10 * SC}" text-anchor="middle" font-size="${11 * SC}" fill="var(--muted)" font-family="Marcellus SC, Georgia, serif" letter-spacing="1">KEPT LOW</text>`;
+  }
+  // zones
+  const left = sp === "sill" ? 170 : 110, right = sp === "sill" ? 550 : 610;
+  const zw = mainIds.length ? (right - left) / mainIds.length : 0;
+  const showSigils = sp === "table" || sp === "room";
+  mainIds.forEach((id, zi) => {
+    const zx = left + zw * zi, cx = zx + zw / 2;
+    const sig = items.find((it) => it.who === id && it.t.startsWith("Sigil"));
+    let its = items.filter((it) => it.who === id && it !== sig);
+    if (zw < 90 * SC) its = its.slice(0, 1); else if (zw < 150 * SC) its = its.slice(0, 2); else its = its.slice(0, 4);
+    if (showSigils) {
+      let r = Math.min(30 * SC, zw / 2 - 6);
+      let sy = Math.min(sp === "room" ? 100 : 120, surf - 56 * SC - 14 * SC - 24 - r);
+      if (sy < r + 6) { r = Math.max(14, (surf - 56 * SC - 14 * SC - 30) / 2); sy = r + 6; }
+      g += `<circle cx="${cx}" cy="${sy}" r="${r + 3}" fill="var(--medallion)"/><image href="${SIGILS[id] || ""}" x="${cx - r}" y="${sy - r}" width="${2 * r}" height="${2 * r}"/>`;
+      if (sig) g += badge(sig.n, cx + r * .75, sy - r * .75);
+      if (zw >= 64) g += `<text x="${cx}" y="${sy + r + 14 + 6 * SC}" text-anchor="middle" font-size="${(zw < 90 ? 10 : 13) * SC}" fill="var(--ink)" font-family="Marcellus, Georgia, serif">${esc(D(id).name)}</text>`;
+    } else if (zw >= 64) {
+      g += `<text x="${cx}" y="${surf + 22 + 12 * SC}" text-anchor="middle" font-size="${12 * SC}" fill="var(--ink)" font-family="Marcellus, Georgia, serif">${esc(D(id).name)}</text>`;
+    }
+    its.forEach((it, i) => {
+      const x = zx + zw * (i + 1) / (its.length + 1);
+      g += glyph(it.g, x, surf) + badge(it.n, x, surf - 56 * SC);
+    });
+  });
+  if (lowIds.length) {
+    const lx = sp === "sill" ? 600 : 640;
+    lowIds.forEach((id, k) => {
+      const its = items.filter((it) => it.who === id).slice(0, 2);
+      its.forEach((it, i) => { const x = lx - 24 * SC + i * 48 * SC + k * 6; g += glyph(it.g, x, lowY) + badge(it.n, x, lowY - 46 * SC); });
+    });
+  }
+  // shared extras on the surface ends
+  const ends = shared.filter((s) => s.g === "candle");
+  ends.forEach((s) => { g += glyph("candle", left - 30, surf) + badge(s.n, left - 30, surf - 56 * SC); });
+  if (!ids.length) g += `<text x="${W / 2}" y="${surf - 40}" text-anchor="middle" font-size="16" fill="var(--muted)" font-family="EB Garamond, Georgia, serif" font-style="italic">Choose a god to begin</text>`;
+  const top = sp === "shelf" ? surf - 70 * SC - 20 : sp === "sill" && SC > 1 ? 20 : 0;
+  const bottom = lowIds.length || sp === "table" || sp === "room" ? H : surf + 30 + 20 * SC;
+  return `<svg viewBox="0 ${top} ${W} ${bottom - top}" role="img" aria-label="Layout of your altar">${g}</svg>`;
+}
+
+/* ---------- Practice ---------- */
+function pairsFor(ids) { return (P().pairs || []).filter((x) => ids.includes(x.a) && ids.includes(x.b)); }
+function practiceSteps() {
+  const p = P(); const ids = ordered(state.deities); const r = p.rules || {};
+  const hasFirst = r.first && ids.includes(r.first) && ids.length > 1;
+  const others = hasFirst ? ids.filter((x) => x !== r.first) : ids;
+  const callOrder = hasFirst ? [r.first, ...others] : ids;
+  const nm = (id) => D(id).name;
+  const steps = [];
+  const dur = state.duration;
+  if (dur === "once") {
+    if (hasFirst) steps.push({ when: "Open", html: `${src("hist")} Turn first to ${nm(r.first)}, then to the others.` });
+    callOrder.forEach((id) => steps.push({ when: nm(id), html: `${tz(D(id).quick, D(id).ch)} ${src("book")}` }));
+    if (hasFirst) steps.push({ when: "Close", html: `End with ${nm(r.first)}. ${src("hist")}` });
+    return steps;
+  }
+  const sitting = () => {
+    const s = [];
+    s.push({ when: "Prepare", html: `Set out or refresh the objects on your altar${state.deities.includes("hestia") ? " and light Hestia's candle" : ""}. ${src("draft")}` });
+    s.push({ when: "Open", html: hasFirst ? `${tz(r.firstText, 1)} Say her invocation first. ${src("hist")}` : `Stand or sit before the altar for a few breaths before you speak. ${src("draft")}` });
+    callOrder.forEach((id) => {
+      if (hasFirst && id === r.first) return;
+      const d = D(id);
+      s.push({ when: d.name, html: `<blockquote>${tz(d.invocation, d.ch)}<cite>Invocation, chapter ${d.ch} ${src("book")}</cite></blockquote><div>Then: ${tz(d.quick, d.ch)} ${src("book")}</div>` });
+    });
+    if (!hasFirst && ids.length === 1) {}
+    s.push({ when: "Reflect", html: ids.map((id) => `<div><span class="who">${esc(nm(id))}</span>${tz(D(id).reflect.quick, D(id).ch)} ${src("book")}</div>`).join("") });
+    s.push({ when: "Close", html: hasFirst ? `Return to Hestia last, and blow out her candle. ${src("hist")}` : `Thank each god by name and step away. ${src("draft")}` });
+    return s;
+  };
+  if (dur === "sitting") {
+    const s = sitting();
+    if (hasFirst) { const h = D(r.first); s.splice(1, 1, { when: "Open", html: `${tz(r.firstText, 1)} ${src("hist")}<blockquote>${tz(h.invocation, h.ch)}<cite>Invocation, chapter ${h.ch} ${src("book")}</cite></blockquote>` }); }
+    return s;
+  }
+  if (dur === "week") {
+    steps.push({ id: "w1", when: "Day 1", html: `Set up the altar as shown above, then do one full sitting: ${callOrder.map(nm).join(", ")}. ${src("draft")}` });
+    for (let i = 2; i <= 6; i++) {
+      const id = callOrder[(i - 2) % callOrder.length];
+      steps.push({ id: "w" + i, when: "Day " + i, html: `The short practice for each god${hasFirst ? ", Hestia first and last" : ""}. Today's reflection, for ${esc(nm(id))}: ${tz(D(id).reflect.quick, D(id).ch)} ${src("book")}` });
+    }
+    steps.push({ id: "w7", when: "Day 7", html: `A full sitting with the deeper reflections. ${src("draft")}` + ids.map((id) => `<div><span class="who">${esc(nm(id))}</span>${tz(D(id).reflect.deeper, D(id).ch)} ${src("book")}</div>`).join("") + `<div>Refresh or clear anything perishable. ${src("draft")}</div>` });
+    return steps;
+  }
+  if (dur === "moon" || dur === "year") {
+    const nou = `${src("hist")} The Noumenia, the first day of the lunar month, was kept for private household offerings to the domestic gods, Hestia among them; ancient households burned frankincense before their gods' images. The fuller modern version with honey cakes and goal-setting comes from contemporary revivalist practice, not ancient record.`;
+    if (dur === "moon") {
+      steps.push({ id: "m0", when: "New moon", html: `Set up or reset the altar and do a full sitting. ${src("draft")}<div class="note">${nou}</div>` });
+      steps.push({ id: "m1", when: "Every day", html: `The short practice for each god. ${src("book")}` });
+      steps.push({ id: "m2", when: "Each week", html: `Refresh what's perishable; read one god's quick reflection and write a few lines. ${src("draft")}` });
+      steps.push({ id: "m3", when: "Full moon", html: `A full sitting with the deeper reflections. ${src("draft")}` + ids.map((id) => `<div><span class="who">${esc(nm(id))}</span>${tz(D(id).reflect.deeper, D(id).ch)} ${src("book")}</div>`).join("") });
+      steps.push({ id: "m4", when: "Next new moon", html: `Clear and clean the altar, then begin again or close the practice. ${src("draft")}` });
+      return steps;
+    }
+    steps.push({ id: "y0", when: "Each new moon", html: `Reset the altar and do a full sitting. ${src("draft")}<div class="note">${nou}</div>` });
+    steps.push({ id: "y1", when: "Every day", html: `The short practice for each god. ${src("book")}` });
+    steps.push({ id: "y2", when: "Festival seasons", html: `In each god's festival season, listed below, re-dress their part of the altar and do a full sitting with the deeper reflection. ${src("draft")}` });
+    return steps;
+  }
+  return steps;
+}
+function festivals() {
+  const ids = ordered(state.deities); const out = [];
+  ids.forEach((id) => D(id).fest.forEach((f) => out.push({ ...f, who: D(id).name })));
+  return out.sort((a, b) => (a.m == null ? 99 : a.m) - (b.m == null ? 99 : b.m));
+}
+
+/* ---------- Plan ---------- */
+function planKey() { return [state.pantheon, ordered(state.deities).join("+"), state.space, state.duration].join("|"); }
+function renderPlan() {
+  const p = P(); const ids = ordered(state.deities);
+  if (!ids.length) {
+    $("plan").innerHTML = `<div><div class="caps" style="color:var(--accent)">Your altar</div><h2>Nothing chosen yet</h2><p class="meta">Choose one or more gods on the left and the altar, its upkeep and its practice will appear here.</p></div><div class="diagram">${diagram({ items: [], shared: [] })}</div>`;
+    return;
+  }
+  const sp = SPACES.find((s) => s.id === state.space), du = DURATIONS.find((t) => t.id === state.duration);
+  const need = NEEDS.find((n) => n.id === state.need);
+  const contents = altarItems();
+  const names = ids.map((id) => D(id).name);
+  const title = names.length <= 3 ? names.join(" · ") : `${names.length} gods of the ${p.name} pantheon`;
+  const r = p.rules || {};
+  let h = `<div><div class="caps" style="color:var(--accent)">${state.example ? "Example altar · change anything" : "Your altar"}</div><h2>${esc(title)}</h2>
+    <p class="meta"><button class="linkbtn backlink" id="backBtn">Change choices</button> <span class="backlink">· </span>${esc(sp.label)} · ${esc(du.label)}${need ? ` · <span class="intent">for ${esc(need.label.toLowerCase())}</span>` : ""}</p></div>`;
+  h += `<div class="diagram">${diagram(contents)}</div>`;
+
+  h += `<div class="sec"><h3>On the altar</h3><ol class="items">` +
+    [...contents.items, ...contents.shared].map((it) => `<li><span class="n">${it.n}</span><span>${it.who ? `<span class="who">${esc(D(it.who).name)}</span>` : ""}${it.src === "draft" ? esc(it.t) : tz(it.t, it.who ? D(it.who).ch : null)} ${src(it.src)}</span></li>`).join("") + `</ol></div>`;
+
+  const notes = [];
+  if (ids.length > 1 && r.first && ids.includes(r.first)) notes.push(`Hestia sits at the center. ${tz(r.firstText, 1)} ${src("hist")}`);
+  ids.filter((id) => r.low && r.low.includes(id)).forEach(() => notes.push(`${tz(r.lowText, 6)} ${src("book")}`));
+  ids.forEach((id) => { const d = D(id); if (d.altarNote) notes.push(`<span class="who">${esc(d.name)}</span>${tz(d.altarNote, d.ch)} ${src("book")}`); });
+  pairsFor(ids).forEach((x) => notes.push(`<span class="who">${esc(D(x.a).name)} &amp; ${esc(D(x.b).name)}</span>${tz(x.text)} ${src("book")}`));
+  if (notes.length) h += `<div class="sec"><h3>Arranging it</h3><ul class="list">${notes.map((n) => `<li>${n}</li>`).join("")}</ul></div>`;
+
+  const up = [];
+  ids.forEach((id) => D(id).upkeep.forEach((u) => up.push(`<span class="who">${esc(D(id).name)}</span>${tz(u, D(id).ch)} ${src("book")}`)));
+  SPACE_UPKEEP[state.space].forEach((u) => up.push(`${esc(u)} ${src("draft")}`));
+  h += `<div class="sec"><h3>Keeping it</h3><ul class="list">${up.map((n) => `<li>${n}</li>`).join("")}</ul></div>`;
+
+  const key = planKey(); const prog = state.progress[key] || {};
+  const steps = practiceSteps();
+  h += `<div class="sec"><h3>The practice</h3><div class="timeline">` + steps.map((s) => {
+    const done = s.id && prog[s.id];
+    const head = s.id ? `<label><input type="checkbox" id="chk-${s.id}" data-step="${s.id}" ${done ? "checked" : ""}><span>Mark done</span></label>` : "";
+    return `<div class="tl${done ? " done" : ""}"><div class="when">${esc(s.when)}</div><div class="what">${s.html}${head}</div></div>`;
+  }).join("") + `</div></div>`;
+
+  if (state.duration === "sitting" || state.duration === "year") {
+    h += `<div class="sec"><h3>Ancient hymns to read aloud</h3>` + ids.map((id) => { const d = D(id); return `<blockquote>${tz(d.hymn.text, d.ch)}<cite>${esc(d.hymn.src)}, quoted in chapter ${d.ch} ${src("hist")}</cite></blockquote>`; }).join("") + `</div>`;
+  }
+  if (state.duration === "moon" || state.duration === "year") {
+    h += `<div class="sec"><h3>Ancient festival seasons</h3><p class="hint">Historical observances documented in the book, with rough modern months. They describe what was done then; how you mark them is yours. ${src("hist")}</p><div class="cal">` +
+      festivals().map((f) => `<div><b>${esc(f.who)}</b>${esc(f.n)}<br><span style="color:var(--muted)">${VIEW === "free" ? lockTag() : esc(f.when)}</span></div>`).join("") + `</div></div>`;
+  }
+  h += `<div class="actions"><button class="btn" id="saveBtn">Save this altar</button><button class="btn ghost" id="copyBtn">Copy as text</button><span class="toast" id="toast" role="status"></span></div>`;
+  h += `<div class="key"><span>${src("book")} the book's practice</span><span>${src("hist")} ancient practice from the book</span><span>${src("draft")} app structure, for review</span></div>`;
+  $("plan").innerHTML = h;
+}
+
+function planText() {
+  const ids = ordered(state.deities); const { items, shared } = altarItems();
+  const sp = SPACES.find((s) => s.id === state.space), du = DURATIONS.find((t) => t.id === state.duration);
+  const tmp = document.createElement("div");
+  const strip = (html) => { tmp.innerHTML = html; tmp.querySelectorAll(".src").forEach((e) => e.remove()); return tmp.textContent.replace(/\s+/g, " ").trim(); };
+  let t = `${ids.map((id) => D(id).name).join(", ")}\n${sp.label} · ${du.label}\n\nON THE ALTAR\n`;
+  [...items, ...shared].forEach((it) => { t += `${it.n}. ${it.who ? D(it.who).name + ": " : ""}${it.src === "draft" ? it.t : strip(tz(it.t, it.who ? D(it.who).ch : null))}\n`; });
+  t += `\nTHE PRACTICE\n`;
+  practiceSteps().forEach((s) => { t += `${s.when}: ${strip(s.html)}\n`; });
+  t += `\nFrom Hearth to Ecstasy, T. Smith`;
+  return t;
+}
+
+/* ---------- Saved altars ---------- */
+function renderSaved() {
+  const list = store.get("altars.v1", []);
+  $("saved").innerHTML = list.length ? list.map((a, i) => `<div class="saved-row"><span>${esc(a.name)}</span><span style="display:flex;gap:12px"><button class="linkbtn" data-load="${i}">Open</button><button class="linkbtn" data-del="${i}">Remove</button></span></div>`).join("")
+    : `<p class="empty">No saved altars yet. Use "Save this altar" under your plan.</p>`;
+}
+function toast(msg) { const t = $("toast"); if (t) { t.textContent = msg; setTimeout(() => { if (t) t.textContent = ""; }, 2600); } }
+
+/* ---------- Profile dialog ---------- */
+function openProfile(id) {
+  const d = D(id);
+  $("profileBody").innerHTML = `<div class="dlg-head"><span class="med"><img src="${SIGILS[id] || ""}" alt=""></span><div><div class="caps" style="color:var(--accent)">Chapter ${d.ch} · ${esc(d.pron)}</div><h2>${esc(d.name)}</h2></div><button class="btn ghost" id="closeDlg">Close</button></div>
+    <p style="font-style:italic">${tz(d.line, d.ch)}</p>
+    <dl><dt>Domain</dt><dd>${esc(d.domain)}</dd><dt>Animal</dt><dd>${esc(d.animal)}</dd><dt>Plant</dt><dd>${esc(d.plant)}</dd><dt>Symbol</dt><dd>${esc(d.symbol)}</dd><dt>Asked for</dt><dd>${esc(d.asked)}</dd><dt>Sigil</dt><dd>${tz(d.sigil, d.ch)}</dd></dl>
+    <blockquote>${tz(d.invocation, d.ch)}<cite>Invocation ${src("book")}</cite></blockquote>`;
+  const dlg = $("profile");
+  if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
+  $("closeDlg").onclick = () => dlg.close ? dlg.close() : dlg.removeAttribute("open");
+}
+
+/* ---------- Events ---------- */
+function renderJump() {
+  const ids = ordered(state.deities); const j = $("jump");
+  j.innerHTML = ids.length ? `<span class="sig">${ids.slice(0, 4).map((id) => `<img src="${SIGILS[id] || ""}" alt="">`).join("")}</span><span class="lbl">See my altar</span>` : `<span class="lbl" style="margin-left:8px">Choose a god to begin</span>`;
+  j.disabled = !ids.length;
+  updateJump();
+}
+let planVisible = false;
+function updateJump() { $("jump").hidden = planVisible || window.innerWidth >= 1000; }
+function setScale() { const s = window.innerWidth < 600 ? 1.7 : 1; if (s !== SC) { SC = s; return true; } return false; }
+function rerender() { setScale(); renderPantheons(); renderNeeds(); renderDeities(); renderOptions(); renderPlan(); renderJump(); }
+function touch() { state.example = false; }
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.p) { state.pantheon = b.dataset.p; state.deities = []; state.need = null; applyTheme(); touch(); rerender(); return; }
+  if (b.dataset.need) { state.need = state.need === b.dataset.need ? null : b.dataset.need; touch(); rerender(); return; }
+  if (b.dataset.d) { const id = b.dataset.d; state.deities = state.deities.includes(id) ? state.deities.filter((x) => x !== id) : [...state.deities, id]; touch(); rerender(); return; }
+  if (b.dataset.s) { state.space = b.dataset.s; touch(); rerender(); return; }
+  if (b.dataset.t) { state.duration = b.dataset.t; touch(); rerender(); return; }
+  if (b.id === "viewFree" || b.id === "viewPaid") {
+    VIEW = b.id === "viewFree" ? "free" : "full";
+    $("viewFree").setAttribute("aria-pressed", VIEW === "free"); $("viewPaid").setAttribute("aria-pressed", VIEW !== "free");
+    $("viewNote").innerHTML = VIEW === "free" ? 'Free shows the first words of each passage from the book, with its chapter. Options marked <span class="full">Full edition</span> are also planned for the paid tier.' : "Paid shows the book's full text: invocations, practices, altar items, reflections and festivals.";
+    renderPlan(); return;
+  }
+  if (b.id === "jump") { $("planBox").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); return; }
+  if (b.id === "backBtn") { $("s1").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  if (b.dataset.info) { openProfile(b.dataset.info); return; }
+  if (b.dataset.clear) { state.deities = []; touch(); rerender(); return; }
+  if (b.id === "saveBtn") {
+    const list = store.get("altars.v1", []);
+    const sp = SPACES.find((s) => s.id === state.space), du = DURATIONS.find((t) => t.id === state.duration);
+    const name = `${ordered(state.deities).map((id) => D(id).name).join(" · ")}, ${sp.label.toLowerCase()}, ${du.label.toLowerCase()}`;
+    list.unshift({ name, s: { pantheon: state.pantheon, need: state.need, deities: state.deities, space: state.space, duration: state.duration }, progress: state.progress[planKey()] || {} });
+    toast(store.set("altars.v1", list.slice(0, 30)) ? "Saved in this browser." : "This browser won't let the page save. Copy the plan as text instead.");
+    renderSaved(); return;
+  }
+  if (b.id === "copyBtn") {
+    const text = planText();
+    try { await navigator.clipboard.writeText(text); toast("Copied."); }
+    catch (err) { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); toast("Copied."); } catch (e2) { toast("Couldn't copy here."); } ta.remove(); }
+    return;
+  }
+  if (b.dataset.load) { const a = store.get("altars.v1", [])[+b.dataset.load]; if (a) { Object.assign(state, a.s, { example: false }); state.progress[planKey()] = a.progress || {}; applyTheme(); rerender(); } return; }
+  if (b.dataset.del) {
+    if (b.dataset.confirm) { const list = store.get("altars.v1", []); list.splice(+b.dataset.del, 1); store.set("altars.v1", list); renderSaved(); }
+    else { b.dataset.confirm = "1"; b.textContent = "Tap again to remove"; }
+    return;
+  }
+});
+document.addEventListener("change", (e) => {
+  const c = e.target.closest("input[data-step]"); if (!c) return;
+  const key = planKey(); state.progress[key] = state.progress[key] || {}; state.progress[key][c.dataset.step] = c.checked;
+  const list = store.get("altars.v1", []);
+  list.forEach((a) => { const s = a.s; if ([s.pantheon, ordered(s.deities).join("+"), s.space, s.duration].join("|") === key) a.progress = state.progress[key]; });
+  store.set("altars.v1", list);
+  c.closest(".tl").classList.toggle("done", c.checked);
+});
+
+/* Open with a god preselected when the link ends in #hestia, #athena, etc. */
+(function init() {
+  const h = (location.hash || "").slice(1).toLowerCase();
+  if (h && P().deities.some((d) => d.id === h)) { state.deities = [h]; state.example = false; }
+  applyTheme(); rerender(); renderSaved();
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((es) => { planVisible = es[0].isIntersecting; updateJump(); }, { threshold: 0 }).observe($("planBox"));
+  }
+  let t; window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { if (setScale()) renderPlan(); updateJump(); }, 150); });
+})();
+</script>
