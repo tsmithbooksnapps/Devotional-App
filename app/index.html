@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hearth &amp; Altar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Marcellus+SC&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a navy "frieze" band like the book cover, then a two-column builder (choices left, live altar plan right; stacked on phones). */
+:root {
+  /* Greek palette, sampled from the From Hearth to Ecstasy cover and sigils. Other pantheons override these from their data. */
+  --bg: #f1eadb;
+  --surface: #e7dcc6;
+  --surface-2: #ded1b4;
+  --ink: #1f2744;
+  --muted: #555a6a;
+  --accent: #a55a22;
+  --accent-soft: rgba(198,123,56,.16);
+  --sage: #6f8582;
+  --line: rgba(37,46,77,.18);
+  --band: #252e4d;
+  --band-ink: #e6dbc5;
+  --band-accent: #c67b38;
+  --medallion: #e6dbc5;
+  --wall: #e3d7bf;
+  --wood: #8a6a4e;
+  --glyph: #252e4d;
+  --font-display: "Marcellus", "Trajan Pro", Georgia, serif;
+  --font-caps: "Marcellus SC", "Marcellus", Georgia, serif;
+  --font-body: "EB Garamond", Garamond, "Times New Roman", serif;
+  --radius: 4px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b2139; --surface: #252e4d; --surface-2: #2e3858; --ink: #e9dfca; --muted: #a9adb9;
+    --accent: #d8914f; --accent-soft: rgba(216,145,79,.16); --sage: #9fb2ae; --line: rgba(230,219,197,.16);
+    --band: #141a30; --band-ink: #e6dbc5; --band-accent: #d8914f; --medallion: #e6dbc5;
+    --wall: #222a46; --wood: #6b543f; --glyph: #e6dbc5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1b2139; --surface: #252e4d; --surface-2: #2e3858; --ink: #e9dfca; --muted: #a9adb9;
+  --accent: #d8914f; --accent-soft: rgba(216,145,79,.16); --sage: #9fb2ae; --line: rgba(230,219,197,.16);
+  --band: #141a30; --band-ink: #e6dbc5; --band-accent: #d8914f; --medallion: #e6dbc5;
+  --wall: #222a46; --wood: #6b543f; --glyph: #e6dbc5; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 18px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; }
+.caps { font-family: var(--font-caps); letter-spacing: .08em; font-size: .78rem; text-transform: uppercase; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+p { margin: 0; }
+
+/* Band */
+.band { background: var(--band); color: var(--band-ink); }
+.band .wrap { padding-block: 28px 22px; display: grid; gap: 18px; }
+.rule { height: 0; border-top: 2px solid var(--band-ink); border-bottom: 2px solid var(--band-ink); padding-top: 4px; opacity: .85; }
+.titlerow { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+.titlerow h1 { font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: .06em; text-transform: uppercase; line-height: 1.05; }
+.titlerow .sub { font-family: var(--font-caps); letter-spacing: .1em; font-size: .85rem; color: var(--band-accent); }
+.frieze { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.frieze::-webkit-scrollbar { display: none; }
+.frieze button { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; border: 0; padding: 0; background: var(--medallion); display: grid; place-items: center; transition: transform .2s; }
+.frieze button img { width: 40px; height: 40px; }
+.frieze button[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--band-accent); }
+@media (hover: hover) { .frieze button:hover { transform: translateY(-2px); } }
+.tagline { max-width: 62ch; font-size: 1.05rem; opacity: .92; }
+
+.notice { border-bottom: 1px solid var(--line); background: var(--surface); }
+.notice .wrap { padding-block: 10px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; font-size: .95rem; color: var(--muted); }
+.notice strong { color: var(--ink); font-weight: 600; }
+
+/* Builder */
+main.wrap { padding-block: 28px 56px; display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1000px) { main.wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); align-items: start; } .plan { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); overflow-y: auto; } }
+.steps { display: grid; gap: 34px; min-width: 0; }
+.step { display: grid; gap: 14px; }
+.stephead { display: flex; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.stephead .num { font-family: var(--font-display); color: var(--accent); font-size: 1.4rem; min-width: 1.6em; }
+.stephead h2 { font-size: 1.45rem; }
+.hint { color: var(--muted); font-size: 1rem; }
+
+.pantheons { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 14px; font-size: .98rem; display: inline-flex; gap: 8px; align-items: center; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip:disabled { cursor: not-allowed; opacity: .6; }
+.chip small { font-family: var(--font-caps); letter-spacing: .06em; font-size: .7rem; text-transform: uppercase; }
+.needs { display: flex; flex-wrap: wrap; gap: 6px; }
+.needs .chip { font-size: .92rem; padding: 3px 11px; }
+
+.deities { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.dcard { position: relative; display: grid; grid-template-columns: 52px minmax(0,1fr); gap: 10px; align-items: center; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 10px 10px 10px 8px; transition: border-color .15s, background .15s; }
+.dcard .med { width: 52px; height: 52px; border-radius: 50%; background: var(--medallion); display: grid; place-items: center; }
+.dcard .med img { width: 48px; height: 48px; }
+.dcard .nm { font-family: var(--font-display); font-size: 1.12rem; line-height: 1.1; }
+.dcard .dm { font-size: .85rem; color: var(--muted); line-height: 1.25; margin-top: 2px; }
+.dcard[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.dcard.rec::after { content: "suggested"; position: absolute; top: -8px; right: 8px; font-family: var(--font-caps); font-size: .62rem; letter-spacing: .08em; background: var(--bg); color: var(--accent); padding: 0 5px; border: 1px solid var(--accent); border-radius: 999px; }
+.dcard.dim { opacity: .55; }
+.selrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .98rem; color: var(--muted); }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+.options { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.opt { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 4px; align-content: start; }
+.opt[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
+.opt .t { font-family: var(--font-display); font-size: 1.1rem; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.opt .d { font-size: .93rem; color: var(--muted); line-height: 1.35; }
+.opt svg { width: 100%; height: 46px; display: block; margin-bottom: 4px; }
+.full { font-family: var(--font-caps); font-size: .62rem; letter-spacing: .08em; color: var(--sage); border: 1px solid var(--sage); border-radius: 999px; padding: 0 6px; white-space: nowrap; }
+
+/* Plan */
+.plan { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }
+.plan-inner { padding: 22px clamp(16px, 3vw, 28px) 28px; display: grid; gap: 22px; }
+.plan h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+.plan h3 { font-size: 1.15rem; display: flex; align-items: baseline; gap: 10px; }
+.plan h3::after { content: ""; flex: 1; border-top: 1px solid var(--line); transform: translateY(-4px); }
+.meta { color: var(--muted); font-size: 1rem; margin-top: 4px; }
+.intent { font-style: italic; }
+.diagram { background: var(--wall); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.diagram svg { display: block; width: 100%; height: auto; }
+.sec { display: grid; gap: 10px; }
+ol.items, ul.list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+ol.items li { display: grid; grid-template-columns: 28px minmax(0,1fr); gap: 10px; align-items: start; }
+ol.items .n { width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--bg); font-family: var(--font-display); font-size: .82rem; display: grid; place-items: center; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.who { font-family: var(--font-caps); font-size: .72rem; letter-spacing: .08em; color: var(--accent); margin-right: 6px; }
+.src { display: inline-block; font-family: var(--font-caps); font-size: .6rem; letter-spacing: .08em; padding: 0 6px; border-radius: 999px; vertical-align: 2px; margin-left: 6px; white-space: nowrap; }
+.src.book { border: 1px solid var(--accent); color: var(--accent); }
+.src.hist { border: 1px solid var(--ink); color: var(--ink); opacity: .75; }
+.src.draft { border: 1px dashed var(--sage); color: var(--sage); }
+ul.list li { padding-left: 16px; position: relative; }
+ul.list li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.note { border-left: 2px solid var(--accent); padding: 4px 0 4px 12px; font-size: 1rem; }
+blockquote { margin: 0; font-style: italic; font-size: 1.08rem; line-height: 1.45; }
+blockquote cite { display: block; font-style: normal; font-size: .85rem; color: var(--muted); margin-top: 4px; }
+.timeline { display: grid; gap: 0; }
+.tl { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.tl:first-child { border-top: 0; padding-top: 0; }
+.tl .when { font-family: var(--font-caps); font-size: .76rem; letter-spacing: .08em; color: var(--accent); padding-top: 3px; }
+.tl .what { display: grid; gap: 6px; min-width: 0; }
+.tl .what > .src, .tl .what > .lock { justify-self: start; margin-left: 0; }
+.tl label { display: flex; gap: 8px; align-items: start; cursor: pointer; }
+.tl input[type=checkbox] { accent-color: var(--accent); width: 18px; height: 18px; margin-top: 4px; flex: 0 0 auto; }
+.tl.done .what > :not(label) { opacity: .6; }
+.cal { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.cal div { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; font-size: .92rem; line-height: 1.3; background: var(--bg); }
+.cal b { font-family: var(--font-caps); font-weight: 400; letter-spacing: .08em; font-size: .72rem; color: var(--accent); display: block; margin-bottom: 2px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { border: 1px solid var(--ink); background: var(--ink); color: var(--bg); border-radius: var(--radius); padding: 8px 16px; font-family: var(--font-caps); letter-spacing: .08em; font-size: .82rem; }
+.btn.ghost { background: transparent; color: var(--ink); }
+.toast { font-size: .95rem; color: var(--accent); align-self: center; }
+.saved { display: grid; gap: 6px; }
+.saved-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 6px; font-size: .98rem; flex-wrap: wrap; }
+.saved-row span { min-width: 0; overflow-wrap: anywhere; }
+.empty { color: var(--muted); font-style: italic; }
+.key { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .9rem; color: var(--muted); }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 20px 36px; color: var(--muted); font-size: .92rem; display: grid; gap: 6px; max-width: 900px; margin: 0 auto; }
+
+dialog { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink); padding: 0; width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
+dialog::backdrop { background: rgba(20,26,48,.55); }
+.dlg { padding: 22px 24px 24px; display: grid; gap: 14px; }
+.dlg-head { display: grid; grid-template-columns: 76px minmax(0,1fr) auto; gap: 14px; align-items: center; }
+.dlg-head .med { width: 76px; height: 76px; border-radius: 50%; background: var(--medallion); display: grid; place-items: center; }
+.dlg-head img { width: 72px; }
+#account .dlg-head { grid-template-columns: minmax(0,1fr) auto; }
+#account h2 { margin: 0; }
+#account { width: min(480px, calc(100vw - 32px)); }
+.dlg dl { display: grid; grid-template-columns: max-content minmax(0,1fr); gap: 6px 14px; margin: 0; font-size: 1rem; }
+.dlg dt { font-family: var(--font-caps); letter-spacing: .08em; font-size: .72rem; color: var(--accent); padding-top: 4px; }
+.dlg dd { margin: 0; }
+@media (max-width: 520px) { .dlg dl { grid-template-columns: minmax(0,1fr); } .dlg dt { padding-top: 6px; } .tl { grid-template-columns: minmax(0,1fr); gap: 4px; } }
+.jump { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 20; display: flex; align-items: center; gap: 10px; max-width: calc(100vw - 32px); background: var(--band); color: var(--band-ink); border: 1px solid var(--band-accent); border-radius: 999px; padding: 10px 18px 10px 10px; box-shadow: 0 6px 20px rgba(20,26,48,.35); font-family: var(--font-caps); letter-spacing: .06em; font-size: .9rem; }
+.jump .sig { display: flex; }
+.jump .sig img { width: 30px; height: 30px; border-radius: 50%; background: var(--medallion); margin-right: -8px; border: 2px solid var(--band); }
+.jump .lbl { margin-left: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg { display: inline-flex; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 3px 14px; font-family: var(--font-caps); letter-spacing: .08em; font-size: .78rem; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.lock { display: inline-block; font-family: var(--font-caps); font-size: .62rem; letter-spacing: .08em; padding: 0 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); vertical-align: 2px; white-space: nowrap; font-style: normal; }
+.acct-actions { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.form { display: grid; gap: 10px; }
+.form label { display: grid; gap: 4px; font-size: .95rem; }
+.form input { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink); }
+.form .err { color: #b3261e; font-size: .95rem; }
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.plans button { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 2px; }
+.plans button b { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; }
+.plans button .pr { font-size: 1.3rem; }
+.plans button.best { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.jump[hidden] { display: none; }
+.backlink { display: none; }
+@media (min-width: 1000px) { .jump { display: none !important; } }
+@media (max-width: 999px) { .backlink { display: inline; } main.wrap { padding-bottom: 96px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <div class="rule"></div>
+    <div class="titlerow">
+      <div>
+        <div class="sub" id="bandSub">A companion to From Hearth to Ecstasy</div>
+        <h1 id="bandTitle">Hearth &amp; Altar</h1>
+      </div>
+      <p class="tagline">Build a personal altar for one god or several, from a single object on a windowsill to a dedicated space, with the practice to keep it.</p>
+    </div>
+    <div class="frieze" id="frieze" aria-label="Quick pick a deity"></div>
+    <div class="rule"></div>
+  </div>
+</header>
+<div class="notice"><div class="wrap">
+  <span id="acctText">Loading…</span>
+  <span class="acct-actions" id="acctActions"></span>
+</div></div>
+
+<main class="wrap" id="main">
+  <div class="steps">
+    <section class="step" aria-labelledby="s1">
+      <div class="stephead"><span class="num">I</span><h2 id="s1">Choose your gods</h2></div>
+      <div class="pantheons" id="pantheons"></div>
+      <div class="hint">What are you bringing to the altar? Pick a need to see which gods the book connects to it, or skip straight to the gods.</div>
+      <div class="needs" id="needs"></div>
+      <div class="deities" id="deities"></div>
+      <div class="selrow" id="selrow"></div>
+    </section>
+    <section class="step" aria-labelledby="s2">
+      <div class="stephead"><span class="num">II</span><h2 id="s2">Choose your space</h2></div>
+      <div class="options" id="spaces"></div>
+    </section>
+    <section class="step" aria-labelledby="s3">
+      <div class="stephead"><span class="num">III</span><h2 id="s3">Choose how long</h2></div>
+      <div class="options" id="durations"></div>
+    </section>
+    <section class="step" aria-labelledby="s4">
+      <div class="stephead"><span class="num">IV</span><h2 id="s4">Your saved altars</h2></div>
+      <div class="hint" id="savedHint">Saved altars stay in this browser on this device.</div>
+      <div class="saved" id="saved"></div>
+    </section>
+  </div>
+
+  <aside class="plan" id="planBox" aria-label="Your altar plan"><div class="plan-inner" id="plan"></div></aside>
+</main>
+
+<footer><div class="wrap">
+  <p>Altar items, invocations, practices, reflections and sigils come from <em>From Hearth to Ecstasy: A Devotional History of the Greek Gods</em> by T. Smith. As the book says, the devotional and ritual material is original creative work, not a claim of religious authority or a guarantee of any particular outcome.</p>
+  <p>Locked passages show their first words and chapter; members see them in full. Labels: <span class="src book">Book</span> the book's own practice. <span class="src hist">History</span> ancient practice the book documents. <span class="src draft">Draft</span> structure added by the app, for the author's review.</p>
+</div></footer>
+
+<button class="jump" id="jump" hidden></button>
+<dialog id="profile"><div class="dlg" id="profileBody"></div></dialog>
+
+<dialog id="account"><div class="dlg" id="accountBody"></div></dialog>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
